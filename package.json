@@ -1,0 +1,17 @@
+{
+  "name": "huajianji",
+  "version": "1.0.0",
+  "description": "花间集 - 中国城市花卉打卡互动地图",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["花卉", "地图", "打卡", "中国风"],
+  "author": "HUAJIANJI",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}

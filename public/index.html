@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>花间集 HUAJIANJI -- 中国城市花卉打卡互动地图</title>
+  <meta name="description" content="花间集 - 中国城市花卉打卡互动地图，记录每一座城市的花语故事">
+  <meta name="keywords" content="花卉,打卡,地图,中国城市,花语,互动地图">
+  <meta name="author" content="花间集">
+  <meta name="theme-color" content="#fafbf7">
+
+  <!-- Google Fonts: 书法字体 + 衬线字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- 样式表 -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/leaflet.css">
+  <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.119/Build/Cesium/Widgets/widgets.css">
+</head>
+<body>
+
+  <!-- ============ 花瓣粒子容器 ============ -->
+  <div id="petals-container" class="petals-container"></div>
+
+  <!-- ============ 3D 地球容器 ============ -->
+  <div id="globe-container" class="globe-container">
+    <canvas id="globe-canvas"></canvas>
+  </div>
+
+  <!-- ============ 顶部导航栏 ============ -->
+  <header class="top-bar">
+    <div class="top-bar__left">
+      <a href="/" style="font-size:12px;color:var(--ink-light);text-decoration:none;padding:3px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0.08);font-family:var(--font-serif);transition:all 0.2s">← 首页</a>
+      <span class="top-bar__logo">🌸</span>
+      <h1 class="top-bar__title">花间集</h1>
+      <span class="top-bar__subtitle">HUAJIANJI</span>
+    </div>
+    <div class="top-bar__center" id="stats-bar">
+      <!-- 统计数据由 JS 动态填充 -->
+    </div>
+    <div class="top-bar__right">
+      <button class="view-toggle" id="view-toggle" title="切换地图/地球视图">
+        <span class="view-toggle__icon" id="toggle-icon">🌍</span>
+        <span class="view-toggle__label" id="toggle-label">地球视图</span>
+      </button>
+      <span class="top-bar__hint">一花一城 · 一步一景</span>
+    </div>
+  </header>
+
+  <!-- ============ 地图主区域 ============ -->
+  <main class="map-area" id="map-area">
+    <!-- 地图缩放控制 -->
+    <div class="map-controls">
+      <button class="map-controls__btn" id="btn-zoom-in" title="放大 (+)">+</button>
+      <button class="map-controls__btn" id="btn-zoom-out" title="缩小 (-)">−</button>
+      <button class="map-controls__btn" id="btn-zoom-reset" title="重置 (0)">⟲</button>
+      <button class="map-controls__btn" id="btn-zoom-fit" title="适应屏幕">⊡</button>
+    </div>
+
+    <!-- 地图视口（Leaflet 容器） -->
+    <div class="map-viewport" id="map-viewport"></div>
+
+    <!-- 季节筛选条 -->
+    <div class="season-filter" id="season-filter">
+      <button class="season-filter__btn active" data-season="all">全部</button>
+      <button class="season-filter__btn" data-season="spring">🌸 春</button>
+      <button class="season-filter__btn" data-season="summer">☀️ 夏</button>
+      <button class="season-filter__btn" data-season="autumn">🍂 秋</button>
+      <button class="season-filter__btn" data-season="winter">❄️ 冬</button>
+    </div>
+  </main>
+
+  <!-- ============ 详情卡片浮层 ============ -->
+  <div class="detail-overlay" id="detail-overlay">
+    <div class="detail-card" id="detail-card">
+      <button class="detail-card__close" id="detail-close">&times;</button>
+      <div class="detail-card__header">
+        <span class="detail-card__emoji" id="detail-emoji"></span>
+        <div class="detail-card__titles">
+          <h2 class="detail-card__city" id="detail-city"></h2>
+          <span class="detail-card__province" id="detail-province"></span>
+        </div>
+      </div>
+      <div class="detail-card__body">
+        <div class="detail-card__flower-row">
+          <span class="detail-card__flower-name" id="detail-flower-name"></span>
+          <span class="detail-card__badge" id="detail-badge">市花</span>
+        </div>
+        <div class="detail-card__info">
+          <div class="detail-card__info-item">
+            <span class="detail-card__info-label">花语</span>
+            <span class="detail-card__info-value" id="detail-desc"></span>
+          </div>
+          <div class="detail-card__info-item">
+            <span class="detail-card__info-label">赏花地</span>
+            <span class="detail-card__info-value" id="detail-place"></span>
+          </div>
+          <div class="detail-card__info-item">
+            <span class="detail-card__info-label">花期</span>
+            <div class="detail-card__months" id="detail-months"></div>
+          </div>
+          <div class="detail-card__info-item">
+            <span class="detail-card__info-label">季节</span>
+            <span class="detail-card__info-value" id="detail-season"></span>
+          </div>
+        </div>
+        <!-- 打卡按钮 -->
+        <div class="detail-card__actions">
+          <button class="checkin-btn" id="checkin-btn">
+            <span class="checkin-btn__icon">📍</span>
+            <span class="checkin-btn__text">打卡此城市</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 底部花卉列表面板 ============ -->
+  <div class="list-panel" id="list-panel">
+    <div class="list-panel__handle" id="list-handle">
+      <div class="list-panel__handle-bar"></div>
+      <span class="list-panel__handle-text">花卉列表</span>
+      <span class="list-panel__handle-arrow" id="list-arrow">▲</span>
+    </div>
+    <div class="list-panel__content" id="list-content">
+      <div class="list-panel__grid" id="list-grid">
+        <!-- 列表项由 JS 动态填充 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 脚本加载 ============ -->
+  <script src="js/vendor/leaflet.js"></script>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.119/Build/Cesium/Cesium.js"></script>
+  <script src="js/flower-icons.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/markers.js"></script>
+  <script src="js/detail.js"></script>
+  <script src="js/list.js"></script>
+  <script src="js/globe.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[
+  { "city": "商洛", "province": "陕西", "lat": 33.87, "lng": 109.93 },
+  { "city": "扬州", "province": "江苏", "lat": 32.39, "lng": 119.43 },
+  { "city": "无锡", "province": "江苏", "lat": 31.49, "lng": 120.31 },
+  { "city": "常州", "province": "江苏", "lat": 31.81, "lng": 119.97 },
+  { "city": "合肥", "province": "安徽", "lat": 31.82, "lng": 117.23 },
+  { "city": "黄山", "province": "安徽", "lat": 30.14, "lng": 118.16 },
+  { "city": "福州", "province": "福建", "lat": 26.07, "lng": 119.31 },
+  { "city": "杭州", "province": "浙江", "lat": 30.27, "lng": 120.15 },
+  { "city": "成都", "province": "四川", "lat": 30.57, "lng": 104.07 },
+  { "city": "昆明", "province": "云南", "lat": 25.04, "lng": 102.71 },
+  { "city": "洛阳", "province": "河南", "lat": 34.62, "lng": 112.45 },
+  { "city": "武汉", "province": "湖北", "lat": 30.59, "lng": 114.31 },
+  { "city": "广州", "province": "广东", "lat": 23.13, "lng": 113.26 },
+  { "city": "长沙", "province": "湖南", "lat": 28.23, "lng": 112.94 },
+  { "city": "南京", "province": "江苏", "lat": 32.06, "lng": 118.80 },
+  { "city": "西安", "province": "陕西", "lat": 34.26, "lng": 108.94 },
+  { "city": "济南", "province": "山东", "lat": 36.65, "lng": 116.99 },
+  { "city": "大理", "province": "云南", "lat": 25.59, "lng": 100.23 }
+]

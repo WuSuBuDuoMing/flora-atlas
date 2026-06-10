@@ -1,0 +1,948 @@
+/* ============================================================
+   花间集 HUAJIANJI -- 升级版配色 + 模板视觉效果
+   参考 map-of-us-template 的 cream/sakura/bloom 暖色系
+   ============================================================ */
+
+/* ---- CSS 变量 ---- */
+:root {
+  /* 模板配色系统 */
+  --color-cream: #fafbf7;
+  --color-mist: #d6e8f0;
+  --color-sky: #a8c8dc;
+  --color-mint: #d4e8d0;
+  --color-leaf: #a8c89a;
+  --color-sakura: #f5dce0;
+  --color-bloom: #e8b8c2;
+  --color-ink: #5a6670;
+  --color-dim: #d8ddd8;
+
+  /* 中国风补充色 */
+  --ink-black: #2c2c2c;
+  --ink-dark: #444;
+  --ink-medium: #777;
+  --ink-light: #aaa;
+  --ink-faint: #ccc;
+  --ink-ghost: #e8e3dc;
+
+  --paper-bg: #f5f0e8;
+  --paper-warm: #faf6ef;
+  --paper-card: #fffdf8;
+
+  --accent-red: #c0392b;
+  --accent-red-light: #e88;
+  --accent-gold: #d4a017;
+  --accent-jade: #2e8b57;
+
+  --spring-color: #e05080;
+  --summer-color: #2e8b57;
+  --autumn-color: #d4a017;
+  --winter-color: #5b9bd5;
+
+  /* 布局 */
+  --top-bar-height: 64px;
+  --list-panel-handle-height: 48px;
+  --list-panel-collapsed-height: 48px;
+  --list-panel-expanded-height: 280px;
+
+  /* 字体 */
+  --font-calligraphy: 'Ma Shan Zheng', cursive;
+  --font-serif: 'Noto Serif SC', 'STSong', 'SimSun', serif;
+  --font-sans: 'Noto Serif SC', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* 动画 */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- 全局重置 ---- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  color: var(--ink-black);
+  background: var(--color-cream);
+}
+
+/* ---- 水墨渐变背景（升级版） ---- */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    /* 淡墨山水装饰 - 左上 */
+    radial-gradient(ellipse 800px 400px at 0% 0%, rgba(214, 232, 240, 0.18) 0%, transparent 70%),
+    /* 淡墨山水装饰 - 右下 */
+    radial-gradient(ellipse 600px 300px at 100% 100%, rgba(245, 220, 224, 0.12) 0%, transparent 70%),
+    /* 中心暖色光晕 */
+    radial-gradient(ellipse 900px 600px at 50% 40%, rgba(232, 184, 194, 0.04) 0%, transparent 70%),
+    /* 整体底色渐变 */
+    linear-gradient(175deg, var(--paper-warm) 0%, var(--color-cream) 50%, #ede8df 100%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ---- 花瓣粒子容器 ---- */
+.petals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  font-size: 20px;
+  opacity: 0;
+  pointer-events: none;
+  animation: petal-fall linear infinite;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
+}
+
+@keyframes petal-fall {
+  0% {
+    transform: translateX(0) translateY(-30px) rotate(0deg) scale(1);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  92% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(var(--drift)) translateY(calc(100vh + 30px)) rotate(var(--rotation)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* ---- 顶部导航栏（升级版 glass-morphism） ---- */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--top-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(250, 251, 247, 0.95) 0%, rgba(250, 251, 247, 0.85) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(216, 221, 216, 0.4);
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(90, 102, 112, 0.05);
+}
+
+.top-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-bar__logo {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.top-bar__title {
+  font-family: var(--font-calligraphy);
+  font-size: 28px;
+  color: var(--ink-black);
+  letter-spacing: 4px;
+  font-weight: normal;
+}
+
+.top-bar__subtitle {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--ink-light);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.top-bar__center {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink-medium);
+  letter-spacing: 1px;
+}
+
+.top-bar__center .stat-highlight {
+  color: var(--accent-red);
+  font-weight: 600;
+}
+
+.top-bar__right {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--ink-light);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar__hint {
+  display: block;
+}
+
+/* ---- 地图主区域 ---- */
+.map-area {
+  position: fixed;
+  top: var(--top-bar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  cursor: grab;
+  z-index: 10;
+}
+
+.map-area:active {
+  cursor: grabbing;
+}
+
+/* ---- 地图缩放控制（模板风格：左侧竖排圆形） ---- */
+.map-controls {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 50;
+  background: rgba(250, 251, 247, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(216, 221, 216, 0.85);
+  border-radius: 999px;
+  padding: 12px 8px;
+  box-shadow: 0 12px 28px rgba(90, 102, 112, 0.1);
+}
+
+.map-controls__btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-ink);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-controls__btn:hover {
+  background: rgba(214, 232, 240, 0.42);
+}
+
+.map-controls__btn:active {
+  transform: scale(0.95);
+}
+
+/* ---- 地图视口（Leaflet 容器） ---- */
+.map-viewport {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+/* Leaflet 地图样式覆盖 */
+.leaflet-container {
+  background: var(--color-cream) !important;
+  font-family: var(--font-serif) !important;
+}
+
+/* 省份 hover 效果 */
+.leaflet-interactive {
+  transition: fill-opacity 0.3s ease, stroke-width 0.3s ease;
+  cursor: pointer;
+}
+
+/* 花卉标记样式 */
+.flower-leaflet-marker {
+  background: transparent !important;
+  border: none !important;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.flower-leaflet-marker:hover {
+  transform: scale(1.3);
+  z-index: 1000 !important;
+}
+
+.flower-leaflet-marker.dimmed {
+  opacity: 0.15;
+}
+
+/* 花卉 tooltip 样式 */
+.flower-tooltip {
+  background: rgba(250, 251, 247, 0.92) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(216, 221, 216, 0.6) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(90, 102, 112, 0.1) !important;
+  font-family: var(--font-serif) !important;
+  font-size: 12px !important;
+  color: var(--color-ink) !important;
+  padding: 4px 10px !important;
+  letter-spacing: 1px;
+}
+
+.flower-tooltip::before {
+  border-top-color: rgba(250, 251, 247, 0.92) !important;
+}
+
+/* ---- 花卉标记（Leaflet 版） ---- */
+
+/* ---- 季节筛选条（模板风格：底部居中） ---- */
+.season-filter {
+  position: absolute;
+  bottom: calc(var(--list-panel-collapsed-height) + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 5px 8px;
+  background: rgba(250, 251, 247, 0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 14px;
+  border: 1px solid rgba(216, 221, 216, 0.6);
+  box-shadow: 0 12px 28px rgba(90, 102, 112, 0.1);
+  z-index: 50;
+  transition: bottom 0.5s var(--ease-spring);
+}
+
+.season-filter.panel-open {
+  bottom: calc(var(--list-panel-expanded-height) + 16px);
+}
+
+.season-filter__btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-medium);
+  font-family: var(--font-serif);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  letter-spacing: 1px;
+}
+
+.season-filter__btn:hover {
+  background: rgba(214, 232, 240, 0.3);
+  color: var(--ink-black);
+}
+
+.season-filter__btn.active {
+  background: var(--color-ink);
+  color: var(--color-cream);
+  box-shadow: 0 2px 10px rgba(90, 102, 112, 0.2);
+  transform: scale(1.05);
+}
+
+.season-filter__btn:active {
+  transform: scale(0.95);
+}
+
+/* ---- 详情卡片浮层 ---- */
+.detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(44, 44, 44, 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-smooth);
+}
+
+.detail-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.detail-card {
+  width: 380px;
+  max-width: 90vw;
+  background: var(--paper-card);
+  border-radius: 20px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transform: translateY(30px) scale(0.95);
+  transition: transform 0.45s var(--ease-spring);
+  position: relative;
+}
+
+.detail-overlay.visible .detail-card {
+  transform: translateY(0) scale(1);
+}
+
+.detail-card__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink-medium);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  z-index: 10;
+}
+
+.detail-card__close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: rotate(90deg);
+  color: var(--ink-black);
+}
+
+.detail-card__header {
+  padding: 28px 28px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--ink-ghost);
+}
+
+.detail-card__emoji {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.detail-card__city {
+  font-family: var(--font-calligraphy);
+  font-size: 30px;
+  font-weight: normal;
+  color: var(--ink-black);
+  letter-spacing: 3px;
+}
+
+.detail-card__province {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--ink-light);
+  letter-spacing: 2px;
+}
+
+.detail-card__body {
+  padding: 20px 28px 28px;
+}
+
+.detail-card__flower-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.detail-card__flower-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent-red);
+}
+
+.detail-card__badge {
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: rgba(192, 57, 43, 0.08);
+  color: var(--accent-red);
+  font-family: var(--font-serif);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.detail-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detail-card__info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: infoSlideIn 0.4s ease forwards;
+}
+
+.detail-card__info-item:nth-child(1) { animation-delay: 0.1s; }
+.detail-card__info-item:nth-child(2) { animation-delay: 0.2s; }
+.detail-card__info-item:nth-child(3) { animation-delay: 0.3s; }
+.detail-card__info-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes infoSlideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.detail-card__info-label {
+  flex-shrink: 0;
+  width: 48px;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--ink-light);
+  padding-top: 2px;
+  letter-spacing: 2px;
+}
+
+.detail-card__info-value {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink-dark);
+  line-height: 1.6;
+}
+
+/* 打卡按钮 */
+.detail-card__actions {
+  padding: 16px 24px 20px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.checkin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed var(--color-bloom);
+  border-radius: 12px;
+  background: rgba(232, 184, 194, 0.06);
+  color: var(--color-bloom);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--ease-spring);
+}
+
+.checkin-btn:hover {
+  background: rgba(232, 184, 194, 0.12);
+  border-style: solid;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(232, 184, 194, 0.2);
+}
+
+.checkin-btn--checked {
+  border-style: solid;
+  background: var(--color-bloom);
+  color: white;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(232, 184, 194, 0.3);
+}
+
+.checkin-btn--checked:hover {
+  transform: none;
+  box-shadow: 0 4px 16px rgba(232, 184, 194, 0.3);
+}
+
+.checkin-btn__icon {
+  font-size: 18px;
+}
+
+.detail-card__months {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.detail-card__month-tag {
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  background: rgba(212, 160, 23, 0.08);
+  color: var(--accent-gold);
+}
+
+/* ---- 底部花卉列表面板 ---- */
+.list-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(250, 251, 247, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(216, 221, 216, 0.4);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 30px rgba(90, 102, 112, 0.06);
+  z-index: 80;
+  transition: height 0.5s var(--ease-spring);
+  height: var(--list-panel-collapsed-height);
+  overflow: hidden;
+}
+
+.list-panel.expanded {
+  height: var(--list-panel-expanded-height);
+}
+
+.list-panel__handle {
+  height: var(--list-panel-handle-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.list-panel__handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-dim);
+  position: absolute;
+  top: 8px;
+}
+
+.list-panel__handle-text {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--ink-medium);
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+.list-panel__handle-arrow {
+  font-size: 12px;
+  color: var(--ink-light);
+  transition: transform 0.4s var(--ease-spring);
+  margin-top: 4px;
+}
+
+.list-panel.expanded .list-panel__handle-arrow {
+  transform: rotate(180deg);
+}
+
+.list-panel__content {
+  padding: 0 20px 20px;
+  overflow-y: auto;
+  max-height: calc(var(--list-panel-expanded-height) - var(--list-panel-handle-height) - 10px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-ghost) transparent;
+}
+
+.list-panel__content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.list-panel__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.list-panel__content::-webkit-scrollbar-thumb {
+  background: var(--ink-ghost);
+  border-radius: 2px;
+}
+
+.list-panel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+/* ---- 列表项 ---- */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  border: 1px solid transparent;
+}
+
+.list-item:hover {
+  background: rgba(214, 232, 240, 0.15);
+  border-color: rgba(216, 221, 216, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(90, 102, 112, 0.05);
+}
+
+.list-item:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.list-item.dimmed {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.list-item__emoji {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.list-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-item__name {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-black);
+}
+
+.list-item__city {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--ink-light);
+  margin-top: 2px;
+}
+
+.list-item__months {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.list-item__month-tag {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--font-serif);
+  font-size: 11px;
+  background: rgba(212, 160, 23, 0.08);
+  color: var(--accent-gold);
+  white-space: nowrap;
+}
+
+/* ---- 3D 地球容器 ---- */
+.globe-container {
+  position: fixed;
+  top: var(--top-bar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 150;
+  background: radial-gradient(ellipse at center, #0d1a2e 0%, #060a12 100%);
+  overflow: hidden;
+  display: none;
+}
+
+.globe-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ---- 视图切换按钮 ---- */
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid rgba(216, 221, 216, 0.6);
+  border-radius: 20px;
+  background: rgba(250, 251, 247, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  box-shadow: 0 8px 24px rgba(90, 102, 112, 0.08);
+  letter-spacing: 1px;
+}
+
+.view-toggle:hover {
+  background: rgba(250, 251, 247, 0.95);
+  transform: scale(1.05);
+  box-shadow: 0 12px 28px rgba(90, 102, 112, 0.12);
+}
+
+.view-toggle:active {
+  transform: scale(0.98);
+}
+
+.view-toggle.active {
+  background: rgba(10, 20, 40, 0.9);
+  color: #88ccff;
+  border-color: rgba(68, 136, 204, 0.3);
+}
+
+.view-toggle__icon {
+  font-size: 16px;
+}
+
+.view-toggle__label {
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* ---- 响应式适配 ---- */
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 0 16px;
+  }
+
+  .top-bar__subtitle,
+  .top-bar__hint {
+    display: none;
+  }
+
+  .top-bar__title {
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+
+  .top-bar__center {
+    font-size: 12px;
+  }
+
+  .map-controls {
+    top: 12px;
+    right: 12px;
+  }
+
+  .detail-card {
+    width: 92vw;
+  }
+
+  .detail-card__header {
+    padding: 20px 20px 16px;
+  }
+
+  .detail-card__body {
+    padding: 16px 20px 20px;
+  }
+
+  .detail-card__city {
+    font-size: 24px;
+  }
+
+  .list-panel__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .season-filter {
+    gap: 4px;
+    padding: 4px 8px;
+  }
+
+  .season-filter__btn {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .flower-marker__emoji {
+    font-size: 24px;
+  }
+
+  .flower-marker__label {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    height: 56px;
+  }
+
+  .map-area {
+    top: 56px;
+  }
+
+  .top-bar__logo {
+    font-size: 22px;
+  }
+
+  .list-panel__grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .top-bar__right .view-toggle__label {
+    display: none;
+  }
+
+  .map-controls {
+    top: 8px;
+    right: 8px;
+  }
+
+  .map-controls__btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .detail-card {
+    width: 95vw;
+    border-radius: 16px;
+  }
+
+  .detail-card__header {
+    padding: 16px 16px 12px;
+  }
+
+  .detail-card__body {
+    padding: 12px 16px 16px;
+  }
+
+  .detail-card__city {
+    font-size: 22px;
+  }
+
+  .detail-card__emoji {
+    font-size: 40px;
+  }
+}
