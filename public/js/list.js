@@ -9,8 +9,7 @@ const ListModule = (function () {
   let isExpanded = false;
   let listItems = []; // { element, data }
 
-  const MONTH_NAMES = ['一月', '二月', '三月', '四月', '五月', '六月',
-                       '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
 
   /**
    * 初始化列表面板
@@ -47,7 +46,7 @@ const ListModule = (function () {
 
       // 花期月份标签（最多显示 3 个）
       const monthTags = flower.months.slice(0, 3)
-        .map(m => `<span class="list-item__month-tag">${MONTH_NAMES[m - 1]}</span>`)
+        .map(m => `<span class="list-item__month-tag">${Utils.MONTH_NAMES[m - 1]}</span>`)
         .join('');
       const moreTag = flower.months.length > 3
         ? `<span class="list-item__month-tag">+${flower.months.length - 3}</span>`

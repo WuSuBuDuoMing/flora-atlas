@@ -9,11 +9,7 @@ const DetailModule = (function () {
   let closeBtn;
   let checkinBtn;
 
-  // 打卡状态 — 每次 show() 时从 localStorage 读取最新数据
-  function getCheckedCities() {
-    try { return JSON.parse(localStorage.getItem('huajianji-checked') || '[]'); }
-    catch { return []; }
-  }
+
 
   // DOM 元素引用
   const els = {};
@@ -50,7 +46,7 @@ const DetailModule = (function () {
     if (checkinBtn) {
       checkinBtn.addEventListener('click', () => {
         if (!currentFlower) return;
-        const checked = getCheckedCities();
+        const checked = Utils.getCheckedCities();
         if (!checked.includes(currentFlower.id)) {
           checked.push(currentFlower.id);
           localStorage.setItem('huajianji-checked', JSON.stringify(checked));
@@ -86,20 +82,10 @@ const DetailModule = (function () {
     els.desc.textContent = flower.desc;
     els.place.textContent = flower.place;
 
-    // 季节文字映射
-    const seasonMap = {
-      spring: '🌸 春季',
-      summer: '☀️ 夏季',
-      autumn: '🍂 秋季',
-      winter: '❄️ 冬季'
-    };
-    els.season.textContent = seasonMap[flower.season] || flower.season;
+    els.season.textContent = Utils.SEASON_MAP[flower.season] || flower.season;
 
-    // 月份标签
-    const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月',
-                        '七月', '八月', '九月', '十月', '十一月', '十二月'];
     els.months.innerHTML = flower.months
-      .map(m => `<span class="detail-card__month-tag">${monthNames[m - 1]}</span>`)
+      .map(m => `<span class="detail-card__month-tag">${Utils.MONTH_NAMES[m - 1]}</span>`)
       .join('');
 
     // 设置主题色
@@ -107,7 +93,7 @@ const DetailModule = (function () {
 
     // 更新打卡按钮状态
     if (checkinBtn) {
-      const isChecked = getCheckedCities().includes(flower.id);
+      const isChecked = Utils.getCheckedCities().includes(flower.id);
       if (isChecked) {
         checkinBtn.classList.add('checkin-btn--checked');
         checkinBtn.querySelector('.checkin-btn__text').textContent = '✓ 已打卡';

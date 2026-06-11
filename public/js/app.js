@@ -67,6 +67,9 @@ const App = (function () {
 
   /**
    * 统计数组中某字段的去重数量
+   * @param {Array} arr - 数据数组
+   * @param {string} field - 要去重的字段名
+   * @returns {number} 去重后的数量
    */
   function getUniqueCount(arr, field) {
     return [...new Set(arr.map(item => item[field]))].length;

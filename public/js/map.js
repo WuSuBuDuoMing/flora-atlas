@@ -55,6 +55,10 @@ const MapModule = (function () {
     bindControls();
   }
 
+  /**
+   * 添加省份 GeoJSON 图层
+   * 根据打卡状态高亮已打卡省份
+   */
   function addProvinces() {
     if (!geoData || !map) return;
 
@@ -110,11 +114,20 @@ const MapModule = (function () {
     map.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
   }
 
+  /**
+   * 从 localStorage 获取已打卡城市 ID 列表
+   * @returns {string[]} 已打卡的城市 ID 数组
+   */
   function getCheckedCities() {
-    try { return JSON.parse(localStorage.getItem('huajianji-checked') || '[]'); }
-    catch { return []; }
+    return Utils.getCheckedCities();
   }
 
+  /**
+   * 判断省份是否已打卡
+   * @param {string} geoName - GeoJSON 中的省份名称
+   * @param {Set<string>} checkedProvinces - 已打卡省份集合
+   * @returns {boolean}
+   */
   function isProvinceChecked(geoName, checkedProvinces) {
     for (const p of checkedProvinces) {
       if (geoName.includes(p) || p.includes(geoName)) return true;
@@ -122,6 +135,9 @@ const MapModule = (function () {
     return false;
   }
 
+  /**
+   * 绑定自定义地图控件（放大、缩小、重置、适应屏幕）
+   */
   function bindControls() {
     document.getElementById('btn-zoom-in').addEventListener('click', () => {
       map.zoomIn();
@@ -158,10 +174,6 @@ const MapModule = (function () {
     if (geoLayer) map.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
   }
 
-  // 兼容旧接口
-  function updateTransform() {}
-  function updateZoom() {}
-
-  return { init, lngLatToPixel, getState, updateTransform, updateZoom, fitToScreen, getMap: () => map };
+  return { init, lngLatToPixel, getState, fitToScreen, getMap: () => map };
 
 })();

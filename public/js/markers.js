@@ -36,6 +36,11 @@ const MarkersModule = (function () {
     });
   }
 
+  /**
+   * 创建花卉标记图标（Leaflet divIcon）
+   * @param {Object} flower - 花卉数据对象
+   * @returns {L.divIcon} Leaflet divIcon 实例
+   */
   function createIcon(flower) {
     // 使用花卉独特图标和颜色
     const icon = typeof getFlowerIcon === 'function'
@@ -59,10 +64,6 @@ const MarkersModule = (function () {
     });
   }
 
-  function positionMarkers() {
-    // Leaflet 自动处理标记定位，无需手动计算
-  }
-
   function filterBySeason(season) {
     markers.forEach(({ leafletMarker, data }) => {
       if (season === 'all' || data.season === season) {
@@ -75,6 +76,10 @@ const MarkersModule = (function () {
     });
   }
 
+  /**
+   * 高亮并定位到指定花卉标记
+   * @param {string} id - 花卉 ID
+   */
   function highlight(id) {
     const match = markers.find(m => m.data.id === id);
     if (match) {
@@ -91,6 +96,6 @@ const MarkersModule = (function () {
     }
   }
 
-  return { init, positionMarkers, filterBySeason, highlight };
+  return { init, filterBySeason, highlight };
 
 })();

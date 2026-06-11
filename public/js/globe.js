@@ -10,10 +10,18 @@ const GlobeModule = (function () {
   let flowers = [];
   let entities = [];
 
+  /**
+   * 初始化 3D 地球模块
+   * @param {Array} flowerData - 花卉数据数组
+   */
   function init(flowerData) {
     flowers = flowerData;
   }
 
+  /**
+   * 显示 3D 地球视图
+   * 首次调用时初始化 CesiumJS viewer
+   */
   function show() {
     isVisible = true;
     const container = document.getElementById('globe-container');
@@ -76,6 +84,10 @@ const GlobeModule = (function () {
     }
   }
 
+  /**
+   * 在 3D 地球上添加花卉标记点
+   * 使用 Canvas 生成圆形图标 + emoji
+   */
   function addFlowerMarkers() {
     if (!viewer || !flowers.length) return;
 
@@ -121,6 +133,11 @@ const GlobeModule = (function () {
     });
   }
 
+  /**
+   * 生成花卉标记的 Canvas 图标
+   * @param {Object} flower - 花卉数据对象
+   * @returns {string} Canvas data URL
+   */
   function createFlowerIcon(flower) {
     // 创建一个 Canvas 图标
     const canvas = document.createElement('canvas');
@@ -146,12 +163,18 @@ const GlobeModule = (function () {
     return canvas.toDataURL();
   }
 
+  /**
+   * 隐藏 3D 地球视图
+   */
   function hide() {
     isVisible = false;
     const container = document.getElementById('globe-container');
     if (container) container.style.display = 'none';
   }
 
+  /**
+   * 销毁 CesiumJS viewer 释放资源
+   */
   function destroy() {
     if (viewer) {
       viewer.destroy();
