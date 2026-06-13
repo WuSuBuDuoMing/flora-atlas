@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.0 (2026-06-14)
+
+### Changed
+- Local optimization and performance improvements
+- Documentation enhancement across project
+- Open-source infrastructure updates
+
 ## v1.1.0 (2026-06-11)
 
 ### Documentation
