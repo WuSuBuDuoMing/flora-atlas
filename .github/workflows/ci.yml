@@ -7,15 +7,23 @@ on:
     branches: [main]
 
 jobs:
-  lint:
+  test:
+    name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Syntax check server.js
         run: node --check server.js
@@ -26,3 +34,31 @@ jobs:
             echo "Checking $f ..."
             node --check "$f"
           done
+
+      - name: Run tests
+        run: npm test
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify package.json is valid JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
+
+      - name: Check for trailing whitespace
+        run: |
+          if grep -rPn ' +$' --include='*.js' --include='*.json' --include='*.css' --include='*.html' .; then
+            echo "Trailing whitespace found. Please remove it."
+            exit 1
+          fi

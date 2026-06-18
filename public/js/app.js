@@ -1,13 +1,20 @@
 /**
- * 花间集 - 主入口模块
- * 协调各模块、加载数据、初始化花瓣粒子
+ * @fileoverview 花间集 - 主入口模块
+ * 协调各子模块、加载花卉数据、初始化花瓣粒子动画和事件绑定
+ *
+ * @module App
  */
 
 const App = (function () {
 
   // ---- 全局数据 ----
+  /** @type {Array<Object>} 全部花卉数据 */
   let allFlowers = [];
+
+  /** @type {string} 当前选中的季节筛选值 */
   let currentSeason = 'all';
+
+  /** @type {boolean} 是否处于 3D 地球视图 */
   let isGlobeView = false;
 
   /**

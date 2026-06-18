@@ -1,13 +1,23 @@
 /**
  * 花间集 - 花卉标记模块（Leaflet 版）
- * 使用 Leaflet marker 定位花卉
+ * 在地图上创建和管理花卉标记点，支持季节过滤和高亮定位
+ *
+ * @module MarkersModule
  */
 
 const MarkersModule = (function () {
 
-  let markers = [];  // { leafletMarker, data }
+  /** @type {Array<{leafletMarker: L.Marker, data: Object}>} 所有标记及其数据 */
+  let markers = [];
+
+  /** @type {L.LayerGroup|null} Leaflet 图层组 */
   let markerLayer = null;
 
+  /**
+   * 初始化花卉标记
+   * 为每朵花卉创建 Leaflet marker 并绑定点击、悬停事件
+   * @param {Array<Object>} flowers - 花卉数据数组
+   */
   function init(flowers) {
     const map = MapModule.getMap();
     if (!map) return;
@@ -64,6 +74,10 @@ const MarkersModule = (function () {
     });
   }
 
+  /**
+   * 按季节过滤标记可见性
+   * @param {string} season - 'all' | 'spring' | 'summer' | 'autumn' | 'winter'
+   */
   function filterBySeason(season) {
     markers.forEach(({ leafletMarker, data }) => {
       if (season === 'all' || data.season === season) {

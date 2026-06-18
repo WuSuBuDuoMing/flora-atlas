@@ -1,7 +1,7 @@
 {
   "name": "huajianji",
-  "version": "1.1.0",
-  "description": "花间集 - 中国城市花卉打卡互动地图",
+  "version": "1.9.0",
+  "description": "Flora Atlas (花间集) - Interactive city flower check-in map of China",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,6 +9,13 @@
     "test": "node --test test/flowers.test.js test/api.test.js"
   },
   "keywords": [
+    "flowers",
+    "map",
+    "china",
+    "leaflet",
+    "cesiumjs",
+    "interactive-map",
+    "city-flowers",
     "花卉",
     "地图",
     "打卡",
@@ -16,6 +23,17 @@
   ],
   "author": "HUAJIANJI",
   "license": "MIT",
+  "homepage": "https://github.com/WuSuBuDuoMing/flora-atlas",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WuSuBuDuoMing/flora-atlas.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WuSuBuDuoMing/flora-atlas/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2"

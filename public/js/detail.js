@@ -1,19 +1,28 @@
 /**
- * 花间集 - 详情卡片模块
- * 点击花卉标记后弹出的详情卡片
+ * @fileoverview 花间集 - 详情卡片模块
+ * 点击花卉标记后弹出的详情卡片，显示花卉信息和打卡交互
+ *
+ * @module DetailModule
  */
 
 const DetailModule = (function () {
 
-  let overlay, card;
+  /** @type {HTMLElement} 遮罩层 */
+  let overlay;
+
+  /** @type {HTMLElement} 卡片容器 */
+  let card;
+
+  /** @type {HTMLElement} 关闭按钮 */
   let closeBtn;
+
+  /** @type {HTMLElement} 打卡按钮 */
   let checkinBtn;
 
-
-
-  // DOM 元素引用
+  /** @type {Object<string, HTMLElement>} 内容元素缓存 */
   const els = {};
 
+  /** @type {Object|null} 当前展示的花卉数据 */
   let currentFlower = null;
 
   /**

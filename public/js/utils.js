@@ -1,17 +1,27 @@
 /**
- * 花间集 - 共享工具函数
+ * @fileoverview 花间集 - 共享工具函数
  * 提供跨模块复用的常量和辅助方法
+ *
+ * @module Utils
  */
 
 const Utils = (function () {
 
-  /** @type {string[]} 中文月份名称（一月到十二月） */
+  /**
+   * 中文月份名称（一月到十二月）
+   * @type {string[]}
+   * @constant
+   */
   const MONTH_NAMES = [
     '一月', '二月', '三月', '四月', '五月', '六月',
     '七月', '八月', '九月', '十月', '十一月', '十二月'
   ];
 
-  /** @type {Object<string, string>} 季节英文 → 中文显示映射 */
+  /**
+   * 季节英文标识到中文显示名称的映射
+   * @type {Object<string, string>}
+   * @constant
+   */
   const SEASON_MAP = {
     spring: '🌸 春季',
     summer: '☀️ 夏季',

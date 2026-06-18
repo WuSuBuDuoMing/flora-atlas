@@ -1,13 +1,29 @@
 /**
- * 花间集 - 花卉列表面板模块
- * 底部可展开/收起的花卉列表
+ * @fileoverview 花间集 - 花卉列表面板模块
+ * 底部可展开/收起的花卉列表，支持季节过滤和触摸滑动手势
+ *
+ * @module ListModule
  */
 
 const ListModule = (function () {
 
-  let panel, handle, grid, arrow;
+  /** @type {HTMLElement} 面板容器 */
+  let panel;
+
+  /** @type {HTMLElement} 拖拽把手 */
+  let handle;
+
+  /** @type {HTMLElement} 列表网格容器 */
+  let grid;
+
+  /** @type {HTMLElement} 展开/收起箭头 */
+  let arrow;
+
+  /** @type {boolean} 是否已展开 */
   let isExpanded = false;
-  let listItems = []; // { element, data }
+
+  /** @type {Array<{element: HTMLElement, data: Object}>} 列表项缓存 */
+  let listItems = [];
 
 
 

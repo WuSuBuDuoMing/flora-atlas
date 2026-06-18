@@ -1,13 +1,23 @@
 /**
- * 花间集 - 3D 地球花海视图（CesiumJS 版）
+ * @fileoverview 花间集 - 3D 地球花海视图（CesiumJS 版）
  * 使用 CesiumJS 渲染真实 3D 地球，花卉标记从城市位置生长
+ *
+ * @module GlobeModule
+ * @requires Cesium
  */
 
 const GlobeModule = (function () {
 
+  /** @type {Cesium.Viewer|null} CesiumJS viewer 实例 */
   let viewer = null;
+
+  /** @type {boolean} 当前视图是否可见 */
   let isVisible = false;
+
+  /** @type {Array<Object>} 花卉数据缓存 */
   let flowers = [];
+
+  /** @type {Array<Cesium.Entity>} 已创建的实体列表 */
   let entities = [];
 
   /**

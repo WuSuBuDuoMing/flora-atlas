@@ -1,6 +1,11 @@
 /**
- * 花间集 - Express 服务端
- * 提供 REST API 和静态文件服务
+ * @fileoverview 花间集 - Express 服务端入口
+ * 提供 REST API 接口和静态文件托管服务
+ *
+ * @module server
+ * @requires express
+ * @requires cors
+ * @requires path
  */
 
 const express = require('express');
@@ -8,7 +13,10 @@ const cors = require('cors');
 const path = require('path');
 const apiRoutes = require('./routes/api');
 
+/** @type {import('express').Express} Express 应用实例 */
 const app = express();
+
+/** @type {number} 服务监听端口，默认 3003 */
 const PORT = process.env.PORT || 3003;
 
 // ---- 中间件 ----

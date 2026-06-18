@@ -1,6 +1,10 @@
 /**
  * 花间集 - 花卉图标数据库
- * 每种花的独特图标和颜色
+ * 每种花的独特 emoji 图标和主题色调（hue）
+ * 用于地图标记、详情卡片、列表的视觉呈现
+ *
+ * @module FlowerIcons
+ * @type {Object<string, {emoji: string, hue: string}>}
  */
 const FlowerIcons = {
   '连翘':     { emoji: '🌼', hue: '#f0c040' },
@@ -36,6 +40,11 @@ const FlowerIcons = {
   '油菜花':   { emoji: '🌼', hue: '#f0d040' },
 };
 
+/**
+ * 获取指定花卉名称的图标和颜色
+ * @param {string} flowerName - 中文花卉名称
+ * @returns {{emoji: string, hue: string}} 图标 emoji 和主题色调
+ */
 function getFlowerIcon(flowerName) {
   return FlowerIcons[flowerName] || { emoji: '🌸', hue: '#e070a0' };
 }

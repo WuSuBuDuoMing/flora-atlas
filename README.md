@@ -1,155 +1,268 @@
-# 花间集 HUAJIANJI
+# Flora Atlas (HuaJianJi / 花间集)
 
-> 中国城市花卉打卡互动地图 — 一花一城，一步一景
+> An interactive map of city flowers across China -- one flower per city, one step per view.
 
-## 简介
+[![CI](https://github.com/WuSuBuDuoMing/flora-atlas/actions/workflows/ci.yml/badge.svg)](https://github.com/WuSuBuDuoMing/flora-atlas/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green.svg)](https://nodejs.org)
 
-「花间集」是一个以中国传统水墨风格设计的花卉打卡互动地图。探索中国各城市的市花，了解它们的花语、花期与赏花圣地。
+**Flora Atlas** (花间集) is an interactive flower-check-in map showcasing the official city flowers of 54 Chinese cities. Explore provincial boundaries on a 2D Leaflet map or rotate a 3D CesiumJS globe, discover each flower's meaning and bloom season, and track your check-ins across the country.
 
-## 技术栈
+---
 
-- **后端**: Node.js + Express
-- **地图引擎**: Leaflet（2D 交互地图）+ CesiumJS（3D 地球视图）
-- **前端**: HTML + CSS + JavaScript（原生，无框架依赖）
-- **数据**: JSON + GeoJSON + REST API
+## Table of Contents
 
-## 功能特性
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [License](#license)
 
-- Leaflet 交互式中国省份地图（GeoJSON 省级边界）
-- CesiumJS 3D 地球视图（卫星影像 + 花卉标记点）
-- 54 个城市市花标记（emoji 花朵图标 + 悬浮提示）
-- 花卉详情卡片（城市、花卉名、花语、赏花地、花期）
-- 底部可展开花卉列表面板（支持触摸滑动手势）
-- 春夏秋冬季节筛选（地图 + 列表联动）
-- 地图拖拽平移、滚轮缩放、自定义控件
-- 打卡统计展示（localStorage 持久化）
-- 花瓣粒子飘落动画
-- 中国传统书法字体 + 水墨渐变装饰
-- 地图 / 地球视图一键切换（平滑过渡动画）
+---
 
-## 快速启动
+## Features
+
+- **Interactive 2D Map** -- Leaflet-powered map with GeoJSON provincial boundaries, hover highlights, and click-to-explore.
+- **3D Globe View** -- CesiumJS satellite imagery globe with flower markers and smooth transitions.
+- **54 City Flowers** -- Complete dataset covering all major provinces with bloom months, flower language, and recommended viewing spots.
+- **Season Filtering** -- Filter flowers by spring / summer / autumn / winter across both map and list views.
+- **Check-in System** -- Mark cities you have visited; progress is persisted in localStorage.
+- **Petal Particle Animation** -- 25 floating emoji petals with randomized drift, size, and rotation.
+- **Responsive Bottom Panel** -- Expandable flower list with touch-swipe gesture support.
+- **Detail Cards** -- Rich information cards showing city, province, flower name, emoji, description, bloom months, and recommended location.
+- **Chinese Ink-Wash Aesthetic** -- Traditional calligraphy fonts, water-ink gradients, and a cream-and-sakura color palette.
+- **RESTful API** -- Express-powered JSON API with endpoints for flowers, seasons, cities, statistics, and GeoJSON data.
+- **Zero Framework Dependency** -- Pure vanilla HTML / CSS / JavaScript on the frontend.
+
+---
+
+## Screenshots
+
+> Add screenshots here after deployment. Suggested views: 2D map, 3D globe, detail card, bottom list panel.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Node.js + Express |
+| 2D Map | Leaflet with GeoJSON province boundaries |
+| 3D Globe | CesiumJS with ArcGIS satellite imagery |
+| Frontend | Vanilla HTML + CSS + JavaScript (no framework) |
+| Data | JSON + GeoJSON + REST API |
+| Tests | Node.js built-in test runner |
+
+---
+
+## Installation
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) >= 18
+- npm (comes with Node.js)
+
+### Steps
 
 ```bash
-# 安装依赖
+# 1. Clone the repository
+git clone https://github.com/WuSuBuDuoMing/flora-atlas.git
+cd flora-atlas
+
+# 2. Install dependencies
 npm install
 
-# 启动服务
+# 3. Start the server
 npm start
+```
 
-# 开发模式
+The application will be available at `http://localhost:3003`.
+
+---
+
+## Usage
+
+### Development Mode
+
+```bash
 npm run dev
+```
 
-# 运行测试
+### Run Tests
+
+```bash
 npm test
 ```
 
-启动后访问 http://localhost:3003
+### Environment Variables
 
-## API 接口
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3003`  | Server listening port |
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/flowers` | 获取所有花卉数据（54 条） |
-| GET | `/api/flowers/:id` | 获取单个花卉详情 |
-| GET | `/api/flowers/season/:season` | 按季节筛选（spring/summer/autumn/winter） |
-| GET | `/api/cities` | 获取 18 个原始城市坐标 |
-| GET | `/api/stats` | 获取统计数据（打卡数、花卉种类、省份覆盖） |
-| GET | `/api/geo` | 获取中国省级 GeoJSON 地图数据 |
+Example:
 
-## 项目结构
+```bash
+PORT=8080 npm start
+```
+
+---
+
+## API Reference
+
+All endpoints return JSON. Base URL: `http://localhost:3003/api`
+
+### GET /api/flowers
+
+Returns all 54 city flower records.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "count": 54,
+  "data": [
+    {
+      "id": "hangzhou",
+      "city": "杭州",
+      "province": "浙江",
+      "name": "桂花",
+      "emoji": "🏵️",
+      "months": [9, 10],
+      "season": "autumn",
+      "color": "#d4a030",
+      "bg": "#faf6eb",
+      "desc": "桂花是杭州的市花...",
+      "place": "满陇桂雨",
+      "lat": 30.25,
+      "lng": 120.17
+    }
+  ]
+}
+```
+
+### GET /api/flowers/:id
+
+Returns a single flower by its ID.
+
+**Example:** `GET /api/flowers/hangzhou`
+
+### GET /api/flowers/season/:season
+
+Filters flowers by season.
+
+**Parameters:**
+
+| Param | Values |
+|-------|--------|
+| `season` | `spring`, `summer`, `autumn`, `winter` |
+
+**Example:** `GET /api/flowers/season/spring`
+
+### GET /api/cities
+
+Returns 18 original city coordinates.
+
+### GET /api/stats
+
+Returns aggregated statistics (total cities, checked cities, flower types, provinces covered).
+
+### GET /api/geo
+
+Returns the full GeoJSON dataset for China's provincial boundaries.
+
+---
+
+## Project Structure
 
 ```
-03-HuaJianJi/
+flora-atlas/
 ├── package.json
-├── server.js              # Express 服务入口
+├── server.js                  # Express server entry point
 ├── routes/
-│   └── api.js             # RESTful API 路由
+│   └── api.js                 # RESTful API routes
 ├── data/
-│   ├── flowers.json       # 54 个城市花卉数据
-│   ├── cities.json        # 18 个原始城市坐标
-│   └── china.geo.json     # 中国省级 GeoJSON 边界
+│   ├── flowers.json           # 54 city flower records
+│   ├── cities.json            # 18 city coordinates
+│   └── china.geo.json         # Provincial GeoJSON boundaries
 ├── public/
-│   ├── index.html         # 前端入口页面
+│   ├── index.html             # Frontend entry page
 │   ├── css/
-│   │   ├── style.css      # 主样式表
-│   │   └── leaflet.css    # Leaflet 覆盖样式
+│   │   ├── style.css          # Main stylesheet
+│   │   └── leaflet.css        # Leaflet overrides
 │   └── js/
-│       ├── utils.js       # 共享工具函数（月份名、季节映射、打卡读取）
-│       ├── app.js         # 主入口模块（协调各模块、花瓣粒子）
-│       ├── map.js         # Leaflet 地图模块（GeoJSON 省份渲染）
-│       ├── markers.js     # 花卉标记模块（Leaflet markers）
-│       ├── detail.js      # 详情卡片模块（打卡交互）
-│       ├── list.js        # 底部列表面板模块（手势支持）
-│       ├── globe.js       # CesiumJS 3D 地球模块
-│       ├── flower-icons.js# 花卉图标数据库（emoji + 颜色）
+│       ├── utils.js           # Shared utility functions
+│       ├── app.js             # Main entry / coordinator
+│       ├── map.js             # Leaflet map module
+│       ├── markers.js         # Flower marker module
+│       ├── detail.js          # Detail card module
+│       ├── list.js            # Bottom list panel module
+│       ├── globe.js           # CesiumJS 3D globe module
+│       ├── flower-icons.js    # Flower icon database
 │       └── vendor/
-│           └── leaflet.js # Leaflet 库
-└── test/
-    ├── flowers.test.js    # 花卉数据结构测试
-    └── api.test.js        # API 接口测试
+│           └── leaflet.js     # Bundled Leaflet library
+├── test/
+│   ├── flowers.test.js        # Flower data structure tests
+│   └── api.test.js            # API endpoint tests
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml             # CI pipeline
+│   ├── ISSUE_TEMPLATE/        # Issue templates
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── FUNDING.yml
+│   └── CODEOWNERS
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── SECURITY.md
+├── CHANGELOG.md
+└── LICENSE
 ```
 
-## 花卉数据
+---
 
-涵盖 54 个城市及其市花，覆盖全国主要省份：
+## Contributing
 
-| 城市 | 省份 | 市花 | 花期 | 季节 |
-|------|------|------|------|------|
-| 商洛 | 陕西 | 连翘 | 3-4月 | 春 |
-| 扬州 | 江苏 | 琼花 | 4-5月 | 春 |
-| 无锡 | 江苏 | 杜鹃花 | 4-5月 | 春 |
-| 常州 | 江苏 | 月季 | 5-10月 | 夏 |
-| 合肥 | 安徽 | 石榴花 | 5-6月 | 夏 |
-| 黄山 | 安徽 | 黄山杜鹃 | 4-5月 | 春 |
-| 福州 | 福建 | 茉莉花 | 5-10月 | 夏 |
-| 杭州 | 浙江 | 桂花 | 9-10月 | 秋 |
-| 成都 | 四川 | 芙蓉花 | 9-10月 | 秋 |
-| 昆明 | 云南 | 山茶花 | 1-3月 | 冬 |
-| 洛阳 | 河南 | 牡丹 | 4-5月 | 春 |
-| 武汉 | 湖北 | 梅花 | 1-3月 | 冬 |
-| 广州 | 广东 | 木棉花 | 3-4月 | 春 |
-| 长沙 | 湖南 | 杜鹃花 | 4-5月 | 春 |
-| 南京 | 江苏 | 梅花 | 1-3月 | 冬 |
-| 西安 | 陕西 | 石榴花 | 5-6月 | 夏 |
-| 济南 | 山东 | 荷花 | 6-8月 | 夏 |
-| 大理 | 云南 | 山茶花 | 1-3月 | 冬 |
-| 北京 | 北京 | 月季 | 5-10月 | 夏 |
-| 上海 | 上海 | 白玉兰 | 3-4月 | 春 |
-| 重庆 | 重庆 | 山茶花 | 1-3月 | 冬 |
-| 哈尔滨 | 黑龙江 | 丁香 | 5-6月 | 春 |
-| 拉萨 | 西藏 | 格桑花 | 6-9月 | 夏 |
-| 天津 | 天津 | 月季 | 5-10月 | 夏 |
-| 石家庄 | 河北 | 月季 | 5-10月 | 夏 |
-| 太原 | 山西 | 菊花 | 9-11月 | 秋 |
-| 呼和浩特 | 内蒙古 | 丁香 | 5-6月 | 春 |
-| 长春 | 吉林 | 玫瑰 | 5-7月 | 夏 |
-| 沈阳 | 辽宁 | 玫瑰 | 5-7月 | 夏 |
-| 南宁 | 广西 | 朱槿 | 全年 | 夏 |
-| 贵阳 | 贵州 | 紫薇 | 6-9月 | 夏 |
-| 兰州 | 甘肃 | 玫瑰 | 5-7月 | 夏 |
-| 西宁 | 青海 | 丁香 | 5-6月 | 春 |
-| 银川 | 宁夏 | 玫瑰 | 5-7月 | 夏 |
-| 乌鲁木齐 | 新疆 | 雪莲花 | 7-8月 | 夏 |
-| 海口 | 海南 | 三角梅 | 11-4月 | 春 |
-| 深圳 | 广东 | 簕杜鹃 | 10-3月 | 秋 |
-| 苏州 | 江苏 | 桂花 | 9-10月 | 秋 |
-| 宁波 | 浙江 | 山茶花 | 1-3月 | 冬 |
-| 厦门 | 福建 | 三角梅 | 11-4月 | 春 |
-| 青岛 | 山东 | 耐冬 | 1-3月 | 冬 |
-| 大连 | 辽宁 | 槐花 | 5-6月 | 春 |
-| 珠海 | 广东 | 簕杜鹃 | 10-3月 | 秋 |
-| 佛山 | 广东 | 桂花 | 9-10月 | 秋 |
-| 东莞 | 广东 | 白玉兰 | 3-4月 | 春 |
-| 芜湖 | 安徽 | 凤凰花 | 5-6月 | 夏 |
-| 南昌 | 江西 | 金边瑞香 | 2-3月 | 冬 |
-| 郑州 | 河南 | 月季 | 5-10月 | 夏 |
-| 丽江 | 云南 | 山茶花 | 1-3月 | 冬 |
-| 三亚 | 海南 | 三角梅 | 11-4月 | 春 |
-| 柳州 | 广西 | 紫荆花 | 3-4月 | 春 |
-| 泉州 | 福建 | 刺桐花 | 3-4月 | 春 |
-| 曲靖 | 云南 | 杜鹃花 | 3-5月 | 春 |
-| 天水 | 甘肃 | 月季 | 5-10月 | 夏 |
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on:
+
+- How to set up the development environment
+- Coding conventions and commit message format
+- How to submit a pull request
+
+By participating, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## Roadmap
+
+- [ ] Add user authentication for server-side check-in persistence
+- [ ] Implement flower search and text-based filtering
+- [ ] Add English / bilingual flower data
+- [ ] Progressive Web App (PWA) support
+- [ ] Add flower photography gallery for each city
+- [ ] Performance optimization: lazy-load CesiumJS bundle
+- [ ] Expand to 100+ cities
+
+---
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Acknowledgements
+
+- [Leaflet](https://leafletjs.com/) -- Open-source JavaScript library for interactive maps
+- [CesiumJS](https://cesium.com/cesiumjs/) -- Open-source JavaScript library for 3D globes
+- [OpenStreetMap](https://www.openstreetmap.org/) -- Map data
+- [ArcGIS](https://www.esri.com/) -- Satellite imagery
+
+---
+
+**Made with care for the beauty of Chinese city flowers.**

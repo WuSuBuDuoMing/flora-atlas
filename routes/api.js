@@ -1,6 +1,11 @@
 /**
- * 花间集 - API 路由
- * RESTful 接口：花卉数据、城市坐标、统计数据、GeoJSON 省级地图
+ * @fileoverview 花间集 - RESTful API 路由
+ * 提供花卉数据、城市坐标、统计数据和 GeoJSON 省级地图接口
+ *
+ * @module routes/api
+ * @requires express
+ * @requires path
+ * @requires fs
  */
 
 const express = require('express');
@@ -8,8 +13,10 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 
-// 读取 JSON 数据
+/** @type {Array<Object>} 54 个城市花卉数据 */
 const flowers = require('../data/flowers.json');
+
+/** @type {Array<Object>} 18 个原始城市坐标 */
 const cities = require('../data/cities.json');
 
 // 读取 GeoJSON 省级地图数据
