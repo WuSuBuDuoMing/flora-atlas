@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  flora-atlas:
+    build: .
+    container_name: flora-atlas
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+    restart: unless-stopped

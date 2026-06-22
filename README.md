@@ -83,6 +83,70 @@ npm start
 
 The application will be available at `http://localhost:3003`.
 
+### Platform-Specific Installation
+
+#### macOS
+
+```bash
+# Install Node.js via Homebrew
+brew install node
+
+# Clone and start
+git clone https://github.com/WuSuBuDuoMing/flora-atlas.git
+cd flora-atlas
+npm install
+npm start
+```
+
+#### Linux (Ubuntu/Debian)
+
+```bash
+# Install Node.js via package manager
+sudo apt update
+sudo apt install nodejs npm
+
+# Clone and start
+git clone https://github.com/WuSuBuDuoMing/flora-atlas.git
+cd flora-atlas
+npm install
+npm start
+```
+
+#### Windows
+
+1. Download and install [Node.js](https://nodejs.org/) (>= 18.0) from the official website.
+2. Open **PowerShell** or **Command Prompt**:
+
+```powershell
+git clone https://github.com/WuSuBuDuoMing/flora-atlas.git
+cd flora-atlas
+npm install
+npm start
+```
+
+#### Docker
+
+```bash
+# Build the image
+docker build -t flora-atlas .
+
+# Run the container
+docker run -d -p 3003:3003 --name flora-atlas flora-atlas
+```
+
+#### Docker Compose
+
+```bash
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
 ---
 
 ## Usage
