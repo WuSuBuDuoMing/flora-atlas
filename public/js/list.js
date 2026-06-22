@@ -68,10 +68,17 @@ const ListModule = (function () {
         ? `<span class="list-item__month-tag">+${flower.months.length - 3}</span>`
         : '';
 
+      // 稀有度徽标
+      const rarityBadge = flower.rarity === 'rare'
+        ? '<span class="list-item__rarity list-item__rarity--rare" title="稀有">稀</span>'
+        : flower.rarity === 'uncommon'
+          ? '<span class="list-item__rarity list-item__rarity--uncommon" title="少见">少</span>'
+          : '';
+
       item.innerHTML = `
         <span class="list-item__emoji">${flower.emoji}</span>
         <div class="list-item__info">
-          <div class="list-item__name">${flower.name}</div>
+          <div class="list-item__name">${flower.name} ${rarityBadge}</div>
           <div class="list-item__city">${flower.city} · ${flower.province}</div>
         </div>
         <div class="list-item__months">
@@ -157,7 +164,7 @@ const ListModule = (function () {
 
   /**
    * 按关键词过滤列表
-   * 模糊匹配 city、province、name、desc、place 字段
+   * 模糊匹配 city、province、name、desc、place、scientific、alias、rarity、habitat 字段
    * @param {string} keyword - 搜索关键词，空字符串表示显示全部
    * @returns {void}
    */
@@ -168,7 +175,7 @@ const ListModule = (function () {
         element.classList.remove('dimmed');
         return;
       }
-      const match = ['city', 'province', 'name', 'desc', 'place'].some(field => {
+      const match = ['city', 'province', 'name', 'desc', 'place', 'scientific', 'alias', 'rarity', 'habitat'].some(field => {
         const val = data[field];
         return typeof val === 'string' && val.toLowerCase().includes(kw);
       });

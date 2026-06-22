@@ -12,7 +12,7 @@ describe('花卉数据 (flowers.json)', () => {
   });
 
   it('每条记录应包含所有必需字段', () => {
-    const requiredFields = ['id', 'city', 'province', 'name', 'emoji', 'months', 'season', 'color', 'bg', 'desc', 'place', 'lat', 'lng'];
+    const requiredFields = ['id', 'city', 'province', 'name', 'emoji', 'months', 'season', 'color', 'bg', 'desc', 'place', 'lat', 'lng', 'scientific', 'alias', 'bestMonth', 'rarity', 'habitat', 'bestTime'];
     flowers.forEach((flower, i) => {
       requiredFields.forEach(field => {
         assert.ok(field in flower, `flowers[${i}] 缺少字段 "${field}"`);
@@ -63,6 +63,26 @@ describe('花卉数据 (flowers.json)', () => {
     assert.ok(seasons.has('summer'));
     assert.ok(seasons.has('autumn'));
     assert.ok(seasons.has('winter'));
+  });
+
+  it('所有稀有度值应合法', () => {
+    const validRarities = ['common', 'uncommon', 'rare'];
+    flowers.forEach(flower => {
+      assert.ok(validRarities.includes(flower.rarity), `${flower.id} 稀有度无效: ${flower.rarity}`);
+    });
+  });
+
+  it('bestMonth 应在 1-12 范围内', () => {
+    flowers.forEach(flower => {
+      assert.ok(flower.bestMonth >= 1 && flower.bestMonth <= 12, `${flower.id} bestMonth 越界: ${flower.bestMonth}`);
+    });
+  });
+
+  it('habitat 和 bestTime 应为非空字符串', () => {
+    flowers.forEach(flower => {
+      assert.ok(typeof flower.habitat === 'string' && flower.habitat.length > 0, `${flower.id} habitat 为空`);
+      assert.ok(typeof flower.bestTime === 'string' && flower.bestTime.length > 0, `${flower.id} bestTime 为空`);
+    });
   });
 });
 

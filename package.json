@@ -1,6 +1,6 @@
 {
   "name": "huajianji",
-  "version": "1.12.0",
+  "version": "1.15.0",
   "description": "Flora Atlas (花间集) - Interactive city flower check-in map of China",
   "main": "server.js",
   "scripts": {

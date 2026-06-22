@@ -1,6 +1,6 @@
 /**
  * @fileoverview 花间集 - RESTful API 路由
- * 提供花卉数据、城市坐标、统计数据、搜索、省份聚合和 GeoJSON 省级地图接口
+ * 提供花卉数据、城市坐标、统计数据、搜索、省份聚合、稀有度筛选和 GeoJSON 省级地图接口
  *
  * @module routes/api
  * @requires express
@@ -19,7 +19,10 @@ const flowers = require('../data/flowers.json');
 /** @type {Array<Object>} 18 个原始城市坐标 */
 const cities = require('../data/cities.json');
 
-// 读取 GeoJSON 省级地图数据
+/**
+ * GeoJSON 省级地图数据（懒加载）
+ * @type {Object|null}
+ */
 let geoData = null;
 try {
   const geoPath = path.join(__dirname, '..', 'data', 'china.geo.json');
@@ -27,6 +30,18 @@ try {
 } catch (err) {
   console.warn('⚠️ 无法加载 china.geo.json:', err.message);
 }
+
+/**
+ * 省份聚合统计数据（缓存，避免重复计算）
+ * @type {Array<Object>|null}
+ */
+let provincesCache = null;
+
+/**
+ * 统计数据（缓存，避免重复计算）
+ * @type {Object|null}
+ */
+let statsCache = null;
 
 /**
  * GET /api/flowers
@@ -77,7 +92,7 @@ router.get('/flowers/season/:season', (req, res) => {
 
 /**
  * GET /api/flowers/search?q=keyword
- * 按关键词搜索花卉，模糊匹配 city、province、name、desc、place 字段
+ * 按关键词搜索花卉，模糊匹配 city、province、name、desc、place、scientific、alias、rarity、habitat 字段
  *
  * @param {string} req.query.q - 搜索关键词（必填，至少 1 个字符）
  * @param {Object} req - Express 请求对象
@@ -116,7 +131,7 @@ router.get('/flowers/search', (req, res) => {
   const keyword = q.trim().toLowerCase();
 
   const matched = flowers.filter(f => {
-    return ['city', 'province', 'name', 'desc', 'place'].some(field => {
+    return ['city', 'province', 'name', 'desc', 'place', 'scientific', 'alias', 'rarity', 'habitat'].some(field => {
       const value = f[field];
       if (typeof value !== 'string') return false;
       return value.toLowerCase().includes(keyword);
@@ -128,6 +143,48 @@ router.get('/flowers/search', (req, res) => {
     query: q.trim(),
     count: matched.length,
     data: matched
+  });
+});
+
+/**
+ * GET /api/flowers/rarity/:rarity
+ * 按稀有度筛选花卉（common / uncommon / rare）
+ * 注意：此路由必须在 /:id 之前，避免被误匹配
+ *
+ * @param {string} req.params.rarity - 稀有度标识 (common|uncommon|rare)
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, rarity: string, count: number, data: Array<Object> }}
+ *
+ * @example
+ * GET /api/flowers/rarity/rare
+ * {
+ *   "success": true,
+ *   "rarity": "rare",
+ *   "count": 3,
+ *   "data": [
+ *     { "id": "...", "name": "雪莲花", "rarity": "rare", ... }
+ *   ]
+ * }
+ */
+router.get('/flowers/rarity/:rarity', (req, res) => {
+  const { rarity } = req.params;
+  const validRarities = ['common', 'uncommon', 'rare'];
+
+  if (!validRarities.includes(rarity)) {
+    return res.status(400).json({
+      success: false,
+      message: `无效稀有度参数，可选值: ${validRarities.join(', ')}`
+    });
+  }
+
+  const filtered = flowers.filter(f => f.rarity === rarity);
+
+  res.json({
+    success: true,
+    rarity,
+    count: filtered.length,
+    data: filtered
   });
 });
 
@@ -174,29 +231,42 @@ router.get('/cities', (req, res) => {
 
 /**
  * GET /api/stats
- * 获取统计数据（总城市数、已收录城市数、花卉品种数、省份数等）
+ * 获取统计数据（总城市数、已收录城市数、花卉品种数、省份数、稀有度分布等）
+ * 使用缓存机制避免重复计算
  *
  * @param {Object} req - Express 请求对象
  * @param {Object} res - Express 响应对象
  * @returns {{ success: boolean, data: Object }}
  */
 router.get('/stats', (req, res) => {
-  const uniqueFlowers = [...new Set(flowers.map(f => f.name))];
-  const uniqueCities = [...new Set(flowers.map(f => f.city))];
-  const uniqueProvinces = [...new Set(flowers.map(f => f.province))];
+  if (!statsCache) {
+    const uniqueFlowers = [...new Set(flowers.map(f => f.name))];
+    const uniqueCities = [...new Set(flowers.map(f => f.city))];
+    const uniqueProvinces = [...new Set(flowers.map(f => f.province))];
+    const rarityCounts = { common: 0, uncommon: 0, rare: 0 };
+    const seasonCounts = { spring: 0, summer: 0, autumn: 0, winter: 0 };
+    flowers.forEach(f => {
+      if (rarityCounts[f.rarity] !== undefined) rarityCounts[f.rarity]++;
+      if (seasonCounts[f.season] !== undefined) seasonCounts[f.season]++;
+    });
 
-  res.json({
-    success: true,
-    data: {
+    statsCache = {
       totalCities: 296,
       checkedCities: flowers.length,
       totalFlowerTypes: 66,
       currentFlowerTypes: uniqueFlowers.length,
       currentProvinces: uniqueProvinces.length,
+      rarityCounts,
+      seasonCounts,
       cities: uniqueCities,
       flowers: uniqueFlowers,
       provinces: uniqueProvinces
-    }
+    };
+  }
+
+  res.json({
+    success: true,
+    data: statsCache
   });
 });
 
@@ -220,31 +290,33 @@ router.get('/stats', (req, res) => {
  * }
  */
 router.get('/provinces', (req, res) => {
-  const provinceMap = {};
+  if (!provincesCache) {
+    const provinceMap = {};
 
-  flowers.forEach(f => {
-    const province = f.province;
-    if (!province) return;
+    flowers.forEach(f => {
+      const province = f.province;
+      if (!province) return;
 
-    if (!provinceMap[province]) {
-      provinceMap[province] = { name: province, flowerCount: 0, cities: new Set() };
-    }
+      if (!provinceMap[province]) {
+        provinceMap[province] = { name: province, flowerCount: 0, cities: new Set() };
+      }
 
-    provinceMap[province].flowerCount += 1;
+      provinceMap[province].flowerCount += 1;
 
-    if (f.city) {
-      provinceMap[province].cities.add(f.city);
-    }
-  });
+      if (f.city) {
+        provinceMap[province].cities.add(f.city);
+      }
+    });
 
-  const data = Object.values(provinceMap)
-    .map(p => ({ ...p, cities: [...p.cities].sort() }))
-    .sort((a, b) => b.flowerCount - a.flowerCount);
+    provincesCache = Object.values(provinceMap)
+      .map(p => ({ ...p, cities: [...p.cities].sort() }))
+      .sort((a, b) => b.flowerCount - a.flowerCount);
+  }
 
   res.json({
     success: true,
-    count: data.length,
-    data
+    count: provincesCache.length,
+    data: provincesCache
   });
 });
 

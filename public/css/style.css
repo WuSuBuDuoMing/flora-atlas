@@ -132,6 +132,97 @@ body::before {
   }
 }
 
+/* ---- 稀有度光环动画 ---- */
+@keyframes rarity-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.15); }
+}
+
+@keyframes rarity-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* ---- 省份信息浮层 ---- */
+.province-tooltip {
+  background: var(--paper-card) !important;
+  border: 1px solid var(--ink-ghost) !important;
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  font-family: var(--font-serif) !important;
+  color: var(--ink-dark) !important;
+  font-size: 12px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+
+/* ---- 花卉信息统计面板 ---- */
+.flower-stats-panel {
+  position: fixed;
+  top: calc(var(--top-bar-height) + 10px);
+  right: 12px;
+  background: var(--paper-card);
+  border: 1px solid var(--ink-ghost);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  color: var(--ink-dark);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  z-index: 500;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth);
+  pointer-events: none;
+}
+
+.flower-stats-panel.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.flower-stats-panel__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 2px 0;
+}
+
+.flower-stats-panel__label {
+  color: var(--ink-medium);
+}
+
+.flower-stats-panel__value {
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
+/* ---- 稀有度徽标 ---- */
+.list-item__rarity {
+  display: inline-block;
+  font-size: 10px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  vertical-align: middle;
+  margin-left: 4px;
+  line-height: 16px;
+  font-weight: 600;
+}
+
+.list-item__rarity--rare {
+  background: linear-gradient(135deg, #f8e8ff, #f0d0ff);
+  color: #8b5cf6;
+  border: 1px solid #d8b4fe;
+}
+
+.list-item__rarity--uncommon {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
 /* ---- 顶部导航栏（升级版 glass-morphism） ---- */
 .top-bar {
   position: fixed;

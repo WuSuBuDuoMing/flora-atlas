@@ -4,6 +4,59 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v1.15.0 (2026-06-23)
+
+### Added
+- **JSDoc annotations**: Comprehensive JSDoc improvements across all frontend modules (`app.js`, `map.js`, `markers.js`, `detail.js`, `list.js`, `globe.js`, `utils.js`) with `@param`, `@returns`, `@type`, `@constant`, `@module` tags; backend `routes/api.js` fully documented with `@example` blocks on all endpoints
+- **Search field expansion**: Search API and frontend filters now match `scientific`, `alias`, `rarity`, and `habitat` fields in addition to the original 5 text fields
+- **Stats caching**: `/api/stats` and `/api/provinces` endpoints now cache computed results for improved response times
+- **Rarity filtering API**: `GET /api/flowers/rarity/:rarity` endpoint to filter flowers by rarity level (common/uncommon/rare)
+- **New test coverage**: 10 additional tests for rarity filtering, province stats, search expansion, new data fields validation
+
+### Changed
+- Expanded search scope from 5 fields to 9 fields across all three layers (API, markers.js, list.js)
+- Stats endpoint now returns `rarityCounts` and `seasonCounts` sub-objects
+- API route-level documentation improved with accurate parameter descriptions and example responses
+- Updated test assertions to validate all 19 data fields per flower entry
+
+## v1.14.0 (2026-06-23)
+
+### Added
+- **Flower stats panel**: Right-side floating panel displaying coverage statistics -- provinces covered, flower types, and rarity distribution (common/uncommon/rare)
+- **Stats data caching**: Client-side `getStats()` function with lazy computation and memoization
+- **Province zoom on click**: Clicking a province on the map now triggers `flyToProvince()` for smooth animated zoom to that region's flowers
+- **Rarity glow markers**: Map markers for rare flowers feature pulsing halo animation (`rarity-pulse`), uncommon flowers show a subtle glow, creating visual hierarchy on the map
+- **Rarity badge in list**: Flower list items now display inline rarity badges -- "稀" (purple) for rare, "少" (gold) for uncommon
+- **New CSS animations**: `rarity-pulse` (pulsing halo), `rarity-float` (gentle float), province tooltip styling, stats panel styles
+
+### Changed
+- Marker `createIcon()` enhanced with rarity-aware visual effects (glow, pulse ring, float animation)
+- Detail card now displays 11 info items (was 9) with habitat and best time of day
+- `flyToProvince()` exported from MapModule for cross-module usage
+- `addProvinces()` click handler now calls `flyToProvince()` before showing details
+
+## v1.13.0 (2026-06-23)
+
+### Added
+- **Flower data enrichment**: All 54 flower entries now include 4 new fields: `habitat` (unique habitat type), `bestTime` (optimal viewing time of day), `scientific` (already present), `bestMonth` (already present), `rarity` (already present) -- now totaling 19 fields per entry
+- **Province fly-to**: Clicking any province on the GeoJSON map smoothly animates the view to zoom into that province's flower cluster using Leaflet `flyToBounds()`
+- **Rarity visual effects**: Rare flowers ("rare") display a pulsing glow ring animation on map markers; uncommon flowers show enhanced shadow glow
+- **List panel rarity badges**: Flower list items display inline rarity indicators -- purple "稀" for rare, gold "少" for uncommon
+- **New CSS animations**: `@keyframes rarity-pulse` and `@keyframes rarity-float` for marker visual effects
+- **New CSS classes**: Province tooltip styling, flower stats panel layout, rarity badge styles (`.list-item__rarity--rare`, `.list-item__rarity--uncommon`)
+
+### Changed
+- Marker `createIcon()` function enhanced with rarity-aware rendering logic
+- `MapModule` now exports `flyToProvince()` for province-level navigation
+- Province click handler in `addProvinces()` now triggers zoom-to-province before showing flower details
+- Detail card HTML expanded with habitat and best time fields
+- Test assertions updated to validate all 19 data fields per flower entry (was 13)
+
+### Improved
+- Province map interaction: clicking a province zooms to show all flowers in that region
+- Visual hierarchy: rare and uncommon flowers are visually distinct from common flowers on the map
+- Data richness: flower entries now include habitat context and optimal viewing time
+
 ## v1.12.0 (2026-06-22)
 
 ### Added

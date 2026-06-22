@@ -98,6 +98,32 @@ describe('API: GET /api/cities', () => {
   });
 });
 
+describe('API: GET /api/flowers/search', () => {
+  it('应按关键词搜索花卉', async () => {
+    const res = await get('/api/flowers/search?q=杭州');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.success, true);
+    assert.ok(res.body.count >= 1);
+    assert.ok(res.body.data.some(f => f.city === '杭州'));
+  });
+
+  it('搜索稀有度关键词也应匹配', async () => {
+    const res = await get('/api/flowers/search?q=rare');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.success, true);
+    assert.ok(res.body.count >= 1);
+    res.body.data.forEach(f => {
+      assert.strictEqual(f.rarity, 'rare');
+    });
+  });
+
+  it('缺少 q 参数应返回 400', async () => {
+    const res = await get('/api/flowers/search');
+    assert.strictEqual(res.status, 400);
+    assert.strictEqual(res.body.success, false);
+  });
+});
+
 describe('API: GET /api/stats', () => {
   it('应返回统计数据', async () => {
     const res = await get('/api/stats');
@@ -106,6 +132,8 @@ describe('API: GET /api/stats', () => {
     assert.ok('totalCities' in res.body.data);
     assert.ok('checkedCities' in res.body.data);
     assert.ok('currentFlowerTypes' in res.body.data);
+    assert.ok('rarityCounts' in res.body.data);
+    assert.ok('seasonCounts' in res.body.data);
     assert.ok('cities' in res.body.data);
     assert.ok('flowers' in res.body.data);
   });
@@ -117,5 +145,38 @@ describe('API: GET /api/geo', () => {
     assert.strictEqual(res.status, 200);
     assert.ok('type' in res.body);
     assert.ok('features' in res.body);
+  });
+});
+
+describe('API: GET /api/flowers/rarity/:rarity', () => {
+  it('应按稀有度筛选花卉', async () => {
+    const res = await get('/api/flowers/rarity/rare');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.success, true);
+    assert.strictEqual(res.body.rarity, 'rare');
+    res.body.data.forEach(f => {
+      assert.strictEqual(f.rarity, 'rare');
+    });
+  });
+
+  it('无效稀有度应返回 400', async () => {
+    const res = await get('/api/flowers/rarity/legendary');
+    assert.strictEqual(res.status, 400);
+    assert.strictEqual(res.body.success, false);
+  });
+});
+
+describe('API: GET /api/provinces', () => {
+  it('应返回省份统计数据', async () => {
+    const res = await get('/api/provinces');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.success, true);
+    assert.ok(Array.isArray(res.body.data));
+    assert.ok(res.body.count > 0);
+    res.body.data.forEach(p => {
+      assert.ok('name' in p);
+      assert.ok('flowerCount' in p);
+      assert.ok('cities' in p);
+    });
   });
 });

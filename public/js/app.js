@@ -17,6 +17,9 @@ const App = (function () {
   /** @type {boolean} 是否处于 3D 地球视图 */
   let isGlobeView = false;
 
+  /** @type {Object|null} 花卉统计数据缓存 */
+  let statsCache = null;
+
   /**
    * 启动应用
    */
@@ -38,6 +41,9 @@ const App = (function () {
 
       // 渲染统计信息
       renderStats();
+
+      // 初始化花卉统计面板
+      initStatsPanel();
 
       // 启动花瓣粒子
       startPetals();
@@ -247,10 +253,90 @@ const App = (function () {
     return allFlowers;
   }
 
+  /**
+   * 计算并缓存花卉统计数据
+   * 包含各季节数量、各稀有度数量、覆盖省份总数等
+   * @returns {Object} 统计数据对象
+   */
+  function getStats() {
+    if (statsCache) return statsCache;
+
+    const seasonCounts = { spring: 0, summer: 0, autumn: 0, winter: 0 };
+    const rarityCounts = { common: 0, uncommon: 0, rare: 0 };
+    const provinces = new Set();
+    const flowerTypes = new Set();
+
+    allFlowers.forEach(f => {
+      if (seasonCounts[f.season] !== undefined) seasonCounts[f.season]++;
+      if (rarityCounts[f.rarity] !== undefined) rarityCounts[f.rarity]++;
+      if (f.province) provinces.add(f.province);
+      if (f.name) flowerTypes.add(f.name);
+    });
+
+    statsCache = {
+      totalCities: allFlowers.length,
+      totalFlowerTypes: flowerTypes.size,
+      totalProvinces: provinces.size,
+      seasonCounts,
+      rarityCounts,
+    };
+
+    return statsCache;
+  }
+
+  /**
+   * 初始化右侧花卉统计信息面板
+   * 显示稀有度分布和覆盖省份数
+   */
+  function initStatsPanel() {
+    const stats = getStats();
+    let panel = document.querySelector('.flower-stats-panel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.className = 'flower-stats-panel';
+      document.body.appendChild(panel);
+    }
+
+    panel.innerHTML = `
+      <div class="flower-stats-panel__row">
+        <span class="flower-stats-panel__label">覆盖省份</span>
+        <span class="flower-stats-panel__value">${stats.totalProvinces}</span>
+      </div>
+      <div class="flower-stats-panel__row">
+        <span class="flower-stats-panel__label">花卉品种</span>
+        <span class="flower-stats-panel__value">${stats.totalFlowerTypes}</span>
+      </div>
+      <div class="flower-stats-panel__row">
+        <span class="flower-stats-panel__label">普通</span>
+        <span class="flower-stats-panel__value">${stats.rarityCounts.common}</span>
+      </div>
+      <div class="flower-stats-panel__row">
+        <span class="flower-stats-panel__label">少见</span>
+        <span class="flower-stats-panel__value">${stats.rarityCounts.uncommon}</span>
+      </div>
+      <div class="flower-stats-panel__row">
+        <span class="flower-stats-panel__label">珍稀</span>
+        <span class="flower-stats-panel__value" style="color:#8b5cf6">${stats.rarityCounts.rare}</span>
+      </div>
+    `;
+
+    // 延迟显示，避免初始化时闪现
+    setTimeout(() => panel.classList.add('visible'), 600);
+  }
+
+  /**
+   * 获取花卉统计数据（外部可调用）
+   * @returns {Object} 统计数据对象
+   */
+  function getStatsData() {
+    return getStats();
+  }
+
   return {
     boot,
     getCurrentSeason,
-    getAllFlowers
+    getAllFlowers,
+    getStatsData
   };
 
 })();

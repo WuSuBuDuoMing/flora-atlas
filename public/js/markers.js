@@ -48,6 +48,7 @@ const MarkersModule = (function () {
 
   /**
    * 创建花卉标记图标（Leaflet divIcon）
+   * 稀有度为 rare 的花卉会有额外的光环动画效果
    * @param {Object} flower - 花卉数据对象
    * @returns {L.divIcon} Leaflet divIcon 实例
    */
@@ -57,18 +58,29 @@ const MarkersModule = (function () {
       ? getFlowerIcon(flower.name)
       : { emoji: flower.emoji, hue: flower.color };
 
+    const isRare = flower.rarity === 'rare';
+    const isUncommon = flower.rarity === 'uncommon';
+    const glowStyle = isRare
+      ? `box-shadow:0 3px 12px ${icon.hue}30, 0 0 18px ${icon.hue}50, 0 0 36px ${icon.hue}20;`
+      : isUncommon
+        ? `box-shadow:0 3px 12px ${icon.hue}30, 0 0 10px ${icon.hue}30;`
+        : `box-shadow:0 3px 12px ${icon.hue}30;`;
+    const rarityRing = isRare
+      ? `<div style="position:absolute;inset:-4px;border-radius:50%;border:2px solid ${icon.hue}60;animation:rarity-pulse 2s ease-in-out infinite;pointer-events:none;"></div>`
+      : '';
+
     return L.divIcon({
       className: 'flower-leaflet-marker',
-      html: `<div style="
+      html: `<div style="position:relative;width:36px;height:36px;${isRare ? 'animation:rarity-float 3s ease-in-out infinite;' : ''}">${rarityRing}<div style="
         width:36px;height:36px;
         border-radius:50%;
         background:linear-gradient(135deg, ${icon.hue}40, ${icon.hue}20);
         border:2px solid ${icon.hue}60;
         display:flex;align-items:center;justify-content:center;
-        box-shadow:0 3px 12px ${icon.hue}30;
+        ${glowStyle}
         cursor:pointer;
         transition:transform 0.3s ease;
-      "><span style="font-size:20px;line-height:1;">${icon.emoji}</span></div>`,
+      "><span style="font-size:20px;line-height:1;">${icon.emoji}</span></div></div>`,
       iconSize: [36, 36],
       iconAnchor: [18, 18],
     });
@@ -112,7 +124,7 @@ const MarkersModule = (function () {
 
   /**
    * 按关键词过滤标记可见性
-   * 模糊匹配 city、province、name、desc、place 字段
+   * 模糊匹配 city、province、name、desc、place、scientific、alias、rarity、habitat 字段
    * @param {string} keyword - 搜索关键词，空字符串表示显示全部
    * @returns {void}
    */
@@ -124,7 +136,7 @@ const MarkersModule = (function () {
         leafletMarker.getElement()?.classList.remove('dimmed');
         return;
       }
-      const match = ['city', 'province', 'name', 'desc', 'place'].some(field => {
+      const match = ['city', 'province', 'name', 'desc', 'place', 'scientific', 'alias', 'rarity', 'habitat'].some(field => {
         const val = data[field];
         return typeof val === 'string' && val.toLowerCase().includes(kw);
       });

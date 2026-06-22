@@ -46,6 +46,8 @@ const DetailModule = (function () {
     els.scientific = document.getElementById('detail-scientific');
     els.alias = document.getElementById('detail-alias');
     els.aliasRow = document.getElementById('detail-alias-row');
+    els.habitat = document.getElementById('detail-habitat');
+    els.bestTime = document.getElementById('detail-best-time');
 
     // 关闭事件
     closeBtn.addEventListener('click', hide);
@@ -105,6 +107,14 @@ const DetailModule = (function () {
     }
     if (els.aliasRow) {
       els.aliasRow.style.display = flower.alias ? '' : 'none';
+    }
+
+    // 填充生境和最佳赏花时段
+    if (els.habitat) {
+      els.habitat.textContent = flower.habitat || '';
+    }
+    if (els.bestTime) {
+      els.bestTime.textContent = flower.bestTime || '';
     }
 
     els.months.innerHTML = flower.months

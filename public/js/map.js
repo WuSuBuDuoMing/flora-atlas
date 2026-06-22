@@ -127,12 +127,13 @@ const MapModule = (function () {
           geoLayer.resetStyle(this);
         });
 
-        // 点击打开详情
+        // 点击省份 → 缩放定位 + 打开详情
         layer.on('click', () => {
           if (typeof App !== 'undefined') {
             const flowers = App.getAllFlowers();
             const match = flowers.find(f => name.includes(f.province) || f.province.includes(name));
             if (match) {
+              flyToProvince(match.province);
               DetailModule.show(match);
               MarkersModule.highlight(match.id);
             }
@@ -165,6 +166,21 @@ const MapModule = (function () {
       if (geoName.includes(p) || p.includes(geoName)) return true;
     }
     return false;
+  }
+
+  /**
+   * 根据省份名缩放定位地图到该区域
+   * 收集该省所有花卉坐标，使用 flyToBounds 平滑飞行动画
+   * @param {string} provinceName - 省份名称
+   * @returns {void}
+   */
+  function flyToProvince(provinceName) {
+    if (!map || typeof App === 'undefined') return;
+    const flowers = App.getAllFlowers().filter(f => f.province === provinceName);
+    if (flowers.length === 0) return;
+
+    const bounds = L.latLngBounds(flowers.map(f => [f.lat, f.lng]));
+    map.flyToBounds(bounds.pad(0.3), { duration: 1.2, maxZoom: 6 });
   }
 
   /**
@@ -278,6 +294,6 @@ const MapModule = (function () {
     if (geoLayer) map.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
   }
 
-  return { init, lngLatToPixel, getState, fitToScreen, getMap: () => map };
+  return { init, lngLatToPixel, getState, fitToScreen, flyToProvince, getMap: () => map };
 
 })();
