@@ -155,9 +155,31 @@ const ListModule = (function () {
     });
   }
 
+  /**
+   * 按关键词过滤列表
+   * 模糊匹配 city、province、name、desc、place 字段
+   * @param {string} keyword - 搜索关键词，空字符串表示显示全部
+   * @returns {void}
+   */
+  function filterBySearch(keyword) {
+    const kw = keyword.toLowerCase();
+    listItems.forEach(({ element, data }) => {
+      if (!kw) {
+        element.classList.remove('dimmed');
+        return;
+      }
+      const match = ['city', 'province', 'name', 'desc', 'place'].some(field => {
+        const val = data[field];
+        return typeof val === 'string' && val.toLowerCase().includes(kw);
+      });
+      element.classList.toggle('dimmed', !match);
+    });
+  }
+
   return {
     init,
     filterBySeason,
+    filterBySearch,
     toggle
   };
 

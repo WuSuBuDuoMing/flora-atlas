@@ -1,6 +1,6 @@
 /**
  * @fileoverview 花间集 - RESTful API 路由
- * 提供花卉数据、城市坐标、统计数据和 GeoJSON 省级地图接口
+ * 提供花卉数据、城市坐标、统计数据、搜索、省份聚合和 GeoJSON 省级地图接口
  *
  * @module routes/api
  * @requires express
@@ -31,6 +31,10 @@ try {
 /**
  * GET /api/flowers
  * 获取全部花卉数据
+ *
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, count: number, data: Array<Object> }}
  */
 router.get('/flowers', (req, res) => {
   res.json({
@@ -44,6 +48,11 @@ router.get('/flowers', (req, res) => {
  * GET /api/flowers/season/:season
  * 按季节筛选花卉（spring / summer / autumn / winter）
  * 注意：此路由必须在 /:id 之前，避免被误匹配
+ *
+ * @param {string} req.params.season - 季节标识 (spring|summer|autumn|winter)
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, season: string, count: number, data: Array<Object> }}
  */
 router.get('/flowers/season/:season', (req, res) => {
   const { season } = req.params;
@@ -67,8 +76,69 @@ router.get('/flowers/season/:season', (req, res) => {
 });
 
 /**
+ * GET /api/flowers/search?q=keyword
+ * 按关键词搜索花卉，模糊匹配 city、province、name、desc、place 字段
+ *
+ * @param {string} req.query.q - 搜索关键词（必填，至少 1 个字符）
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, query: string, count: number, data: Array<Object> }}
+ *
+ * @example
+ * GET /api/flowers/search?q=牡丹
+ * {
+ *   "success": true,
+ *   "query": "牡丹",
+ *   "count": 2,
+ *   "data": [
+ *     { "id": "...", "name": "牡丹", "city": "洛阳", "province": "河南", ... }
+ *   ]
+ * }
+ *
+ * @example
+ * // 缺少 q 参数
+ * GET /api/flowers/search
+ * {
+ *   "success": false,
+ *   "message": "缺少搜索关键词参数 q"
+ * }
+ */
+router.get('/flowers/search', (req, res) => {
+  const q = req.query.q;
+
+  if (!q || q.trim().length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少搜索关键词参数 q'
+    });
+  }
+
+  const keyword = q.trim().toLowerCase();
+
+  const matched = flowers.filter(f => {
+    return ['city', 'province', 'name', 'desc', 'place'].some(field => {
+      const value = f[field];
+      if (typeof value !== 'string') return false;
+      return value.toLowerCase().includes(keyword);
+    });
+  });
+
+  res.json({
+    success: true,
+    query: q.trim(),
+    count: matched.length,
+    data: matched
+  });
+});
+
+/**
  * GET /api/flowers/:id
  * 获取单个花卉详情
+ *
+ * @param {string} req.params.id - 花卉唯一标识
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, data: Object }}
  */
 router.get('/flowers/:id', (req, res) => {
   const flower = flowers.find(f => f.id === req.params.id);
@@ -89,6 +159,10 @@ router.get('/flowers/:id', (req, res) => {
 /**
  * GET /api/cities
  * 获取所有城市坐标数据
+ *
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, count: number, data: Array<Object> }}
  */
 router.get('/cities', (req, res) => {
   res.json({
@@ -100,7 +174,11 @@ router.get('/cities', (req, res) => {
 
 /**
  * GET /api/stats
- * 获取统计数据
+ * 获取统计数据（总城市数、已收录城市数、花卉品种数、省份数等）
+ *
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, data: Object }}
  */
 router.get('/stats', (req, res) => {
   const uniqueFlowers = [...new Set(flowers.map(f => f.name))];
@@ -123,8 +201,60 @@ router.get('/stats', (req, res) => {
 });
 
 /**
+ * GET /api/provinces
+ * 获取所有省份及其花卉统计，按花卉数量降序排列
+ *
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {{ success: boolean, count: number, data: Array<{ name: string, flowerCount: number, cities: string[] }> }}
+ *
+ * @example
+ * GET /api/provinces
+ * {
+ *   "success": true,
+ *   "count": 20,
+ *   "data": [
+ *     { "name": "云南", "flowerCount": 8, "cities": ["昆明", "大理", "丽江"] },
+ *     { "name": "四川", "flowerCount": 5, "cities": ["成都", "九寨沟"] }
+ *   ]
+ * }
+ */
+router.get('/provinces', (req, res) => {
+  const provinceMap = {};
+
+  flowers.forEach(f => {
+    const province = f.province;
+    if (!province) return;
+
+    if (!provinceMap[province]) {
+      provinceMap[province] = { name: province, flowerCount: 0, cities: new Set() };
+    }
+
+    provinceMap[province].flowerCount += 1;
+
+    if (f.city) {
+      provinceMap[province].cities.add(f.city);
+    }
+  });
+
+  const data = Object.values(provinceMap)
+    .map(p => ({ ...p, cities: [...p.cities].sort() }))
+    .sort((a, b) => b.flowerCount - a.flowerCount);
+
+  res.json({
+    success: true,
+    count: data.length,
+    data
+  });
+});
+
+/**
  * GET /api/geo
  * 获取中国省级 GeoJSON 地图数据
+ *
+ * @param {Object} req - Express 请求对象
+ * @param {Object} res - Express 响应对象
+ * @returns {Object} GeoJSON FeatureCollection
  */
 router.get('/geo', (req, res) => {
   if (!geoData) {

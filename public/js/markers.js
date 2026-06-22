@@ -110,6 +110,42 @@ const MarkersModule = (function () {
     }
   }
 
-  return { init, filterBySeason, highlight };
+  /**
+   * 按关键词过滤标记可见性
+   * 模糊匹配 city、province、name、desc、place 字段
+   * @param {string} keyword - 搜索关键词，空字符串表示显示全部
+   * @returns {void}
+   */
+  function filterBySearch(keyword) {
+    const kw = keyword.toLowerCase();
+    markers.forEach(({ leafletMarker, data }) => {
+      if (!kw) {
+        leafletMarker.setOpacity(1);
+        leafletMarker.getElement()?.classList.remove('dimmed');
+        return;
+      }
+      const match = ['city', 'province', 'name', 'desc', 'place'].some(field => {
+        const val = data[field];
+        return typeof val === 'string' && val.toLowerCase().includes(kw);
+      });
+      if (match) {
+        leafletMarker.setOpacity(1);
+        leafletMarker.getElement()?.classList.remove('dimmed');
+      } else {
+        leafletMarker.setOpacity(0.1);
+        leafletMarker.getElement()?.classList.add('dimmed');
+      }
+    });
+  }
+
+  /**
+   * 获取当前显示的标记数量
+   * @returns {number} 未被隐藏的标记数量
+   */
+  function getVisibleCount() {
+    return markers.filter(({ leafletMarker }) => leafletMarker.getOpacity() > 0.5).length;
+  }
+
+  return { init, filterBySeason, filterBySearch, highlight, getVisibleCount };
 
 })();

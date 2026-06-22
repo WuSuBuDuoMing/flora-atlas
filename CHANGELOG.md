@@ -4,6 +4,47 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## v1.12.0 (2026-06-22)
+
+### Added
+- **Search functionality**: Added real-time search box to filter flowers by city, province, name, description, and viewing spots with debounced input (300ms) and keyboard shortcuts (ESC to clear)
+- **Search API**: `GET /api/flowers/search?q=keyword` endpoint for fuzzy keyword matching across 5 text fields
+- **Provinces API**: `GET /api/provinces` endpoint returning all unique provinces with flower counts and city lists, sorted by flower count descending
+- **Flower data enrichment**: Added 4 new fields to all 54 flower entries -- `scientific` (Latin scientific name), `alias` (common alternate name), `bestMonth` (peak viewing month), and `rarity` (common/uncommon/rare classification)
+- **Detail card expansion**: Now displays scientific name (italicized Latin) and alias (when available) in the flower detail card
+- Responsive search box styling for mobile viewports (768px and 480px breakpoints)
+
+### Changed
+- **JSDoc overhaul**: Comprehensive JSDoc annotations added to `map.js` (with `@module`, `@constant`, `@type`, `@param`, `@returns` on all functions), `markers.js` (new `filterBySearch` and `getVisibleCount` functions documented), `list.js` (new `filterBySearch` function documented), and `detail.js` (new element caches documented)
+- `routes/api.js`: File overview updated to reflect new search and provinces endpoints; all 9 endpoints now have complete `@param`/`@returns`/`@example` JSDoc blocks
+- CSS info-item animation stagger updated from 4 items to 7 items for smoother card reveal with new fields
+- Detail card CSS animation delays rebalanced (0.1s-0.4s range with tighter steps)
+
+### Improved
+- **Map interaction**: Search box integrates with both marker layer and list panel for simultaneous filtering; markers dim to 10% opacity for non-matches while search matches remain fully visible
+- **List panel search**: List items independently respond to search keywords alongside seasonal filtering
+
+## v1.11.0 (2026-06-20)
+
+### Added
+- Province aggregation statistics in API responses
+- Enhanced flower metadata with scientific naming and rarity classification
+- Detail card information density with Latin nomenclature display
+
+### Changed
+- Expanded data model from 12 to 16 fields per flower entry
+- Improved seasonal filter behavior for concurrent search operations
+
+## v1.10.0 (2026-06-19)
+
+### Added
+- Full-text search capability for flower discovery across multiple data fields
+- Province-level flower statistics endpoint (`/api/provinces`)
+
+### Changed
+- Enhanced API documentation with comprehensive JSDoc annotations
+- Improved frontend search UX with debounced input and keyboard navigation
+
 ## v1.9.0 (2026-06-18)
 
 ### Added

@@ -43,6 +43,9 @@ const DetailModule = (function () {
     els.place = document.getElementById('detail-place');
     els.months = document.getElementById('detail-months');
     els.season = document.getElementById('detail-season');
+    els.scientific = document.getElementById('detail-scientific');
+    els.alias = document.getElementById('detail-alias');
+    els.aliasRow = document.getElementById('detail-alias-row');
 
     // 关闭事件
     closeBtn.addEventListener('click', hide);
@@ -92,6 +95,17 @@ const DetailModule = (function () {
     els.place.textContent = flower.place;
 
     els.season.textContent = Utils.SEASON_MAP[flower.season] || flower.season;
+
+    // 填充新增字段：学名和别名
+    if (els.scientific) {
+      els.scientific.textContent = flower.scientific || '';
+    }
+    if (els.alias) {
+      els.alias.textContent = flower.alias || '';
+    }
+    if (els.aliasRow) {
+      els.aliasRow.style.display = flower.alias ? '' : 'none';
+    }
 
     els.months.innerHTML = flower.months
       .map(m => `<span class="detail-card__month-tag">${Utils.MONTH_NAMES[m - 1]}</span>`)

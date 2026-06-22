@@ -321,6 +321,81 @@ body::before {
 
 /* ---- 花卉标记（Leaflet 版） ---- */
 
+/* ---- 搜索框 ---- */
+.search-box {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(250, 251, 247, 0.92);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 14px;
+  border: 1px solid rgba(216, 221, 216, 0.6);
+  box-shadow: 0 8px 24px rgba(90, 102, 112, 0.1);
+  z-index: 50;
+  width: 280px;
+  transition: width 0.35s var(--ease-smooth), box-shadow 0.35s ease;
+}
+
+.search-box:focus-within {
+  width: 340px;
+  box-shadow: 0 12px 32px rgba(90, 102, 112, 0.16);
+  border-color: rgba(232, 184, 194, 0.5);
+}
+
+.search-box__icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.search-box__input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--ink-black);
+  outline: none;
+  letter-spacing: 0.5px;
+}
+
+.search-box__input::placeholder {
+  color: var(--ink-light);
+  letter-spacing: 1px;
+}
+
+.search-box__clear {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ink-medium);
+  font-size: 14px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.search-box__clear:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--ink-black);
+}
+
+.search-box--has-value .search-box__clear {
+  display: flex;
+}
+
 /* ---- 季节筛选条（模板风格：底部居中） ---- */
 .season-filter {
   position: absolute;
@@ -512,9 +587,12 @@ body::before {
 }
 
 .detail-card__info-item:nth-child(1) { animation-delay: 0.1s; }
-.detail-card__info-item:nth-child(2) { animation-delay: 0.2s; }
-.detail-card__info-item:nth-child(3) { animation-delay: 0.3s; }
-.detail-card__info-item:nth-child(4) { animation-delay: 0.4s; }
+.detail-card__info-item:nth-child(2) { animation-delay: 0.15s; }
+.detail-card__info-item:nth-child(3) { animation-delay: 0.2s; }
+.detail-card__info-item:nth-child(4) { animation-delay: 0.25s; }
+.detail-card__info-item:nth-child(5) { animation-delay: 0.3s; }
+.detail-card__info-item:nth-child(6) { animation-delay: 0.35s; }
+.detail-card__info-item:nth-child(7) { animation-delay: 0.4s; }
 
 @keyframes infoSlideIn {
   to {
@@ -538,6 +616,12 @@ body::before {
   font-size: 14px;
   color: var(--ink-dark);
   line-height: 1.6;
+}
+
+.detail-card__info-value--latin {
+  font-style: italic;
+  color: var(--ink-medium);
+  font-size: 13px;
 }
 
 /* 打卡按钮 */
@@ -871,6 +955,22 @@ body::before {
 
   .list-panel__grid {
     grid-template-columns: 1fr;
+  }
+
+  .search-box {
+    width: 200px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 10px;
+  }
+
+  .search-box:focus-within {
+    width: 240px;
+  }
+
+  .search-box__input {
+    font-size: 12px;
   }
 
   .season-filter {
